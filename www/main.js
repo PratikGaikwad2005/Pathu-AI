@@ -40,6 +40,6 @@ $(document).ready(function() {
         $("#Oval").attr("hidden", true);
         $("#SiriWave").attr("hidden", false);
         eel.playClickSound();
-        eel.speech_to_text()();
+        eel.allCommands()();
     });
 });

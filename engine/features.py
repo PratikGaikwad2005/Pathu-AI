@@ -12,3 +12,4 @@ def playAssistantSound():
 def playClickSound():
     music_dir = "www\\assets\\audio\\pathu_click_sound.mp3"
     playsound(music_dir)
+    
