@@ -1,3 +1,4 @@
+import time
 import pyttsx3
 import speech_recognition as sr
 import eel
@@ -30,10 +31,10 @@ def speech_to_text():
         eel.DisplayMessage('Recognizing...')
         query = r.recognize_google(audio , language = 'en')
         print(f'User said: {query}')
-        speak(query)
-        
+        #speak(query)
+        time.sleep(2)
         eel.DisplayMessage(query)                  # This function displayMessage is use to display the message on fron end whoes function is defined in controller.js
-        eel.ShowHood()
+        
     
     except Exception as e:
         print("Say that again please...")
@@ -52,6 +53,12 @@ def allCommands():
     print(query)
     
     if 'open' in query:
-        print('is running')
+        from engine.features import openCommand
+        openCommand(query)
+    elif 'on youtube' in query:
+        from engine.features import PlayYoutube
+        PlayYoutube(query)
     else:
         print('not running')
+    
+    eel.ShowHood()
