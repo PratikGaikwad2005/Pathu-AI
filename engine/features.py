@@ -1,10 +1,18 @@
 import re
+import sqlite3
+import webbrowser
 from engine.config import ASSISTANT_NAME
 from playsound import playsound
 import eel
 import os
 from engine.command import speak
 import pywhatkit as kit
+
+
+conn = sqlite3.connect('pathuDB.db')
+
+cursor = conn.cursor()
+
 
 # function to play start sound
 def playAssistantSound():
@@ -18,17 +26,42 @@ def playClickSound():
     music_dir = "www\\assets\\audio\\pathu_click_sound.mp3"
     playsound(music_dir)
     
+    
+# function to open application or webapp based on database entries
 def openCommand(query):
     query = query.replace(ASSISTANT_NAME , "")
-    query = query.replace('open',"")    
+    query = query.replace('open',"").strip().lower()    
     
-    query.lower()
     
     if query != "":
-        speak("Opening" + query)
-        os.system('start' +query)
-    else:
-        speak(f"{query} not found")
+        try:
+            # Try to find the application in sys_command table
+            cursor.execute('SELECT path FROM sys_command WHERE LOWER(name) = ?', (query,))
+            results = cursor.fetchall()
+
+            if len(results) != 0:
+                speak("Opening " + query)
+                os.startfile(results[0][0])
+                return
+
+            # If not found, try to find the URL in web_command table
+            cursor.execute('SELECT url FROM web_command WHERE LOWER(name) = ?', (query,))
+            results = cursor.fetchall()
+            
+            if len(results) != 0:
+                speak("Opening " + query)
+                webbrowser.open(results[0][0])
+                return
+
+            # If still not found, try to open using os.system
+            speak("Opening " + query)
+            try:
+                os.system('start ' + query)
+            except Exception as e:
+                speak(f"Unable to open {query}. Error: {str(e)}")
+
+        except Exception as e:
+            speak(f"Something went wrong: {str(e)}")
         
 def PlayYoutube(query):
     search_term = extract_yt_term(query)
